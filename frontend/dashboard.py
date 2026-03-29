@@ -8,10 +8,12 @@ import pytesseract
 from fpdf import FPDF
 from docx import Document 
 
-# --- IMPORTANT FOR WINDOWS USERS ---
-# If Tesseract is not in your system PATH, point it to your installation:
-# pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-
+# --- STEP 1: DYNAMIC URL LOGIC ---
+if "BACKEND_URL" in st.secrets:
+    API_BASE_URL = st.secrets["BACKEND_URL"]
+else:
+    API_BASE_URL = "http://127.0.0.1:8000"
+    
 # 1. Page Configuration (Must be the first Streamlit command)
 st.set_page_config(page_title="Legal AI Suite", page_icon="⚖️", layout="wide")
 
@@ -119,7 +121,8 @@ def document_sidebar():
             if uploaded_files:
                 with st.spinner("Encrypting and Indexing..."):
                     files = [("files", (f.name, f.getvalue(), "application/pdf")) for f in uploaded_files]
-                    response = requests.post("http://127.0.0.1:8000/upload-docs", files=files)
+                    # CHANGED: Added API_BASE_URL
+                    response = requests.post(f"{API_BASE_URL}/upload-docs", files=files)
                     
                     if response.status_code == 200:
                         st.session_state.indexed = True
@@ -148,7 +151,6 @@ def lawyer_dashboard():
     document_sidebar()
     st.title("💼 Counsel Strategy Dashboard")
     
-    # --- ADDED TABS HERE ---
     tab1, tab2 = st.tabs(["💬 Strategy & Analysis", "📸 Scan Physical Document (OCR)"])
     
     with tab1:
@@ -157,7 +159,8 @@ def lawyer_dashboard():
             
             if st.button("📅 Generate Case Timeline", use_container_width=True):
                 with st.spinner("Scanning case files for dates and events..."):
-                    res = requests.post("http://127.0.0.1:8000/timeline")
+                    # CHANGED: Added API_BASE_URL
+                    res = requests.post(f"{API_BASE_URL}/timeline")
                     if res.status_code == 200:
                         timeline_data = res.json()["timeline"]
                         if "messages" not in st.session_state:
@@ -194,7 +197,8 @@ def lawyer_dashboard():
                             "chat_history": history_string,
                             "search_web": use_kanoon
                         }
-                        res = requests.post("http://127.0.0.1:8000/ask", json=payload)
+                        # CHANGED: Added API_BASE_URL
+                        res = requests.post(f"{API_BASE_URL}/ask", json=payload)
                         
                         if res.status_code == 200:
                             answer = res.json()["answer"]
@@ -205,7 +209,6 @@ def lawyer_dashboard():
         else:
             st.warning("Please upload case files in the sidebar to begin building your strategy.")
 
-    # --- ADDED OCR SCANNER TAB HERE ---
     with tab2:
         st.header("📸 Digitize Hard Copy")
         st.caption("Upload a photo of a physical document. Extract the text and convert it to a PDF for the AI Vault.")
@@ -256,9 +259,9 @@ def judge_dashboard():
         if st.button("Evaluate Evidence"):
             if query:
                 with st.spinner("Reviewing statutes..."):
-                    # I updated this to a POST request so it actually matches your new backend API!
                     payload = {"question": query, "mode": "judge", "chat_history": "", "search_web": False}
-                    res = requests.post("http://127.0.0.1:8000/ask", json=payload)
+                    # CHANGED: Added API_BASE_URL
+                    res = requests.post(f"{API_BASE_URL}/ask", json=payload)
                     if res.status_code == 200:
                         st.markdown("### 📜 Judicial Opinion")
                         st.write(res.json()["answer"])
