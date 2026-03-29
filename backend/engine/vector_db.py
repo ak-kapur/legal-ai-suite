@@ -19,13 +19,13 @@ class VectorEngine:
         vector_db = Chroma.from_documents(
             documents=documents,
             embedding=self.embeddings,
-            persist_directory=self.db_path
+            persist_directory = os.path.join(os.getcwd(), "chroma_db_vault")
         )
         return vector_db
 
     def get_retriever(self):
         vector_db = Chroma(
-            persist_directory=self.db_path,
+            persist_directory = os.path.join(os.getcwd(), "chroma_db_vault"),
             embedding_function=self.embeddings
         )
         return vector_db.as_retriever(search_kwargs={"k": 5})
