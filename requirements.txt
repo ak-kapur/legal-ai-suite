@@ -23,6 +23,7 @@ duckduckgo-search>=5.2.1
 
 # Word Document Export
 python-docx>=1.1.0
+langchain-chroma>=0.1.0
 
 # OCR & Image Processing
 opencv-python-headless>=4.9.0.80
