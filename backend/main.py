@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from typing import List, Dict
 # Import the classes we just built
-from engine.processor import DocumentProcessor
-from engine.vector_db import VectorEngine
-from engine.agents import LegalAgents
+from backend.engine.processor import DocumentProcessor
+from backend.engine.vector_db import VectorEngine
+from backend.engine.agents import LegalAgents
 
 # 1. Setup and Security
 load_dotenv()
