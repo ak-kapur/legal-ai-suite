@@ -1,0 +1,28 @@
+# Security & API Keys
+.env
+.secret
+credentials.json
+
+# Python Caches (Junk files)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+legal_ai_suite/
+
+
+faiss_index/
+uploaded_pdfs/
+temp/
+*.pdf
+*.docx
+*.jpg
+*.png
+
+# IDE Settings (VS Code, PyCharm)
+.vscode/
+.idea/

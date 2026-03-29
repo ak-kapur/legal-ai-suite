@@ -1,0 +1,30 @@
+# Frontend
+streamlit>=1.32.0
+
+# Backend Framework
+fastapi>=0.110.0
+uvicorn>=0.28.0
+requests>=2.31.0
+
+# AI & LangChain Ecosystem
+langchain>=0.1.13
+langchain-core>=0.1.33
+langchain-community>=0.0.29
+langchain-google-genai>=1.0.1
+google-generativeai>=0.4.1
+
+# Vector Database & Document Parsing
+faiss-cpu>=1.8.0
+PyPDF2>=3.0.0
+
+# Web Search (Indian Kanoon)
+duckduckgo-search>=5.2.1
+ddgs>=0.1.0
+
+# Word Document Export
+python-docx>=1.1.0
+
+# OCR & Image Processing
+opencv-python>=4.9.0
+pytesseract>=0.3.10
+fpdf>=1.7.2
