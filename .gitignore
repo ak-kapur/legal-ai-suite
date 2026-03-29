@@ -3,19 +3,19 @@
 .secret
 credentials.json
 
-# Python Caches (Junk files)
+# Python Caches
 __pycache__/
 *.py[cod]
-*$py.class
 
 # Virtual Environments
 venv/
-env/
 .venv/
-legal_ai_suite/
 
-
+# Local Vector Databases (CRITICAL)
+backend/chroma_db/
 faiss_index/
+
+# Temporary Files
 uploaded_pdfs/
 temp/
 *.pdf
@@ -23,6 +23,6 @@ temp/
 *.jpg
 *.png
 
-# IDE Settings (VS Code, PyCharm)
+# IDE Settings
 .vscode/
 .idea/
