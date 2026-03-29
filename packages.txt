@@ -1,0 +1,1 @@
+text tesseract-ocr libtesseract-dev
