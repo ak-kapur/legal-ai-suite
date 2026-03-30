@@ -29,11 +29,7 @@ class QueryRequest(BaseModel):
     chat_history: str = ""
     search_web: bool = False
 
-# 2. Initialize Engines (Lazy Loading in vector_db handles the heavy lifting)
-doc_processor = DocumentProcessor()
-vector_engine = VectorEngine()
-legal_agents = LegalAgents()
-
+# --- HEALTH CHECK (Render uses this to see if you are alive) ---
 @app.get("/")
 def health_check():
     return {"status": "Live", "service": "Legal AI Suite"}
@@ -41,6 +37,10 @@ def health_check():
 @app.post("/upload-docs")
 async def upload_documents(files: List[UploadFile] = File(...)):
     try:
+        # Initializing inside the function for "Speed Boot"
+        doc_processor = DocumentProcessor()
+        vector_engine = VectorEngine()
+        
         docs = doc_processor.process_to_documents(files)
         if not docs:
             raise HTTPException(status_code=400, detail="No readable text found.")
@@ -54,6 +54,10 @@ async def upload_documents(files: List[UploadFile] = File(...)):
 @app.post("/ask")
 async def ask_question(req: QueryRequest):
     try:
+        # Initializing inside the function so Render starts fast
+        vector_engine = VectorEngine()
+        legal_agents = LegalAgents()
+        
         retriever = vector_engine.get_retriever()
         
         if req.search_web:
@@ -71,6 +75,10 @@ async def ask_question(req: QueryRequest):
 @app.post("/timeline")
 async def get_timeline():
     try:
+        # Initializing inside the function
+        vector_engine = VectorEngine()
+        legal_agents = LegalAgents()
+        
         retriever = vector_engine.get_retriever()
         timeline = legal_agents.generate_timeline(retriever)
         return {"timeline": timeline}
@@ -79,5 +87,6 @@ async def get_timeline():
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
+    # This part handles the Render Port correctly
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
