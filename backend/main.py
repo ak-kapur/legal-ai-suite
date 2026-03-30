@@ -7,9 +7,9 @@ from typing import List, Dict
 import uvicorn
 
 # Import the classes
-from backend.engine.processor import DocumentProcessor
-from backend.engine.vector_db import VectorEngine
-from backend.engine.agents import LegalAgents
+from engine.processor import DocumentProcessor
+from engine.vector_db import VectorEngine
+from engine.agents import LegalAgents
 
 # 1. Setup
 load_dotenv()
