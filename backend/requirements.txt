@@ -13,7 +13,7 @@ langchain-core>=0.1.33
 langchain-community>=0.0.29
 langchain-google-genai>=1.0.1
 google-generativeai>=0.4.1
-
+python-multipart>=0.0.9
 # Vector Database (Lite)
 chromadb>=0.4.24
 langchain-chroma>=0.1.0
