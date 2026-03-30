@@ -5,27 +5,29 @@ streamlit>=1.32.0
 fastapi>=0.110.0
 uvicorn>=0.28.0
 requests>=2.31.0
+python-dotenv>=1.0.0
 
-# AI & LangChain Ecosystem
+# AI & LangChain (API-Based to save 400MB RAM)
 langchain>=0.1.13
 langchain-core>=0.1.33
 langchain-community>=0.0.29
 langchain-google-genai>=1.0.1
 google-generativeai>=0.4.1
 
-# Vector Database & Document Parsing
-faiss-cpu>=1.8.0
+# Vector Database (Lite)
 chromadb>=0.4.24
-pypdf>=4.0.0
-langchain-huggingface>=0.0.3
-# Web Search (Indian Kanoon)
-duckduckgo-search>=5.2.1
-
-# Word Document Export
-python-docx>=1.1.0
 langchain-chroma>=0.1.0
-sentence-transformers>=3.0.0
-# OCR & Image Processing
+
+# Document Parsing & OCR
+pypdf>=4.0.0
+python-docx>=1.1.0
+# We keep these but ensure we don't load them until needed
 opencv-python-headless>=4.9.0.80
 pytesseract>=0.3.10
 fpdf>=1.7.2
+
+# Web Search
+duckduckgo-search>=5.2.1
+
+# REMOVED: faiss-cpu, sentence-transformers, langchain-huggingface
+# These three are the "RAM Killers" that cause the crash.

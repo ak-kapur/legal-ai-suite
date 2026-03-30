@@ -3,30 +3,34 @@ from langchain_chroma import Chroma
 
 class VectorEngine:
     def __init__(self):
-        # We start with these as None so the server boots instantly
+        # We start with None, but it will initialize instantly since it's an API call
         self._embeddings = None 
+        # Using a specific path for persistent storage
         self.db_path = os.path.join(os.getcwd(), "chroma_db_vault")
 
     @property
     def embeddings(self):
         """
-        Lazy-loads the embedding model only when first accessed.
-        This prevents Render from timing out during startup.
+        Loads Google's Cloud Embeddings. 
+        Uses 0MB of local RAM because the math happens on Google's servers.
         """
         if self._embeddings is None:
-            # We import here so the library isn't even loaded until needed
-            from langchain_huggingface import HuggingFaceEmbeddings
-            print("--- Initializing AI Embedding Model (Lazy Load) ---")
-            self._embeddings = HuggingFaceEmbeddings(
-                model_name="all-MiniLM-L6-v2"
+            # Import inside the property to keep the initial boot light
+            from langchain_google_genai import GoogleGenerativeAIEmbeddings
+            
+            print("--- Initializing Google Cloud Embeddings ---")
+            # Ensure your GOOGLE_API_KEY is in Render's Environment Variables
+            self._embeddings = GoogleGenerativeAIEmbeddings(
+                model="models/embedding-001",
+                google_api_key=os.getenv("GOOGLE_API_KEY")
             )
         return self._embeddings
 
     def save_documents(self, documents):
         """
-        Takes a list of LangChain Document objects and saves them to ChromaDB.
+        Saves LangChain Document objects to ChromaDB.
         """
-        # Calling self.embeddings triggers the @property loader above
+        # self.embeddings triggers the Cloud-based property above
         vector_db = Chroma.from_documents(
             documents=documents,
             embedding=self.embeddings,
@@ -36,7 +40,7 @@ class VectorEngine:
 
     def get_retriever(self):
         """
-        Loads the existing database and returns a retriever object.
+        Loads the existing vault and returns a retriever object.
         """
         vector_db = Chroma(
             persist_directory=self.db_path,
