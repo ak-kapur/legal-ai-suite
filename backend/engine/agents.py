@@ -20,7 +20,7 @@ class LegalAgents:
                 print("⚠️ WARNING: GOOGLE_API_KEY is missing in Environment Variables!")
             
             self._llm = ChatGoogleGenerativeAI(
-                model="models/gemini-1.5-flash", # Note: use 1.5-flash as 2.5 isn't a standard public tier name yet
+                model="gemini-2.0-flash-exp", 
                 google_api_key=self.api_key,
                 temperature=0.1 
             )
