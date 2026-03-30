@@ -1,46 +1,55 @@
+# 1. THE CRITICAL RENDER HACK: This must be at the very top!
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 import os
 from langchain_chroma import Chroma
 
 class VectorEngine:
     def __init__(self):
-        # We start with None, but it will initialize instantly since it's an API call
+        # Start as None for instant server boot
         self._embeddings = None 
-        # Using a specific path for persistent storage
+        # Persistent storage path in the Render project directory
         self.db_path = os.path.join(os.getcwd(), "chroma_db_vault")
 
     @property
     def embeddings(self):
         """
         Loads Google's Cloud Embeddings. 
-        Uses 0MB of local RAM because the math happens on Google's servers.
+        Math happens on Google's servers, saving ~400MB of local RAM.
         """
         if self._embeddings is None:
-            # Import inside the property to keep the initial boot light
+            # Lazy-import to keep the initial boot light
             from langchain_google_genai import GoogleGenerativeAIEmbeddings
             
-            print("--- Initializing Google Cloud Embeddings ---")
-            # Ensure your GOOGLE_API_KEY is in Render's Environment Variables
+            print("--- Initializing Google Cloud Embeddings (gemini-embedding-2-preview) ---")
+            
             self._embeddings = GoogleGenerativeAIEmbeddings(
-                model="models/embedding-001",
+                # Using the latest model string
+                model="models/gemini-embedding-2-preview",
                 google_api_key=os.getenv("GOOGLE_API_KEY")
             )
         return self._embeddings
 
     def save_documents(self, documents):
         """
-        Saves LangChain Document objects to ChromaDB.
+        Saves documents to ChromaDB using the Google Cloud Embedding API.
         """
-        # self.embeddings triggers the Cloud-based property above
-        vector_db = Chroma.from_documents(
-            documents=documents,
-            embedding=self.embeddings,
-            persist_directory=self.db_path
-        )
-        return vector_db
+        try:
+            vector_db = Chroma.from_documents(
+                documents=documents,
+                embedding=self.embeddings,
+                persist_directory=self.db_path
+            )
+            return vector_db
+        except Exception as e:
+            print(f"FAILED TO SAVE TO VAULT: {str(e)}")
+            raise e
 
     def get_retriever(self):
         """
-        Loads the existing vault and returns a retriever object.
+        Loads the vault and returns a retriever.
         """
         vector_db = Chroma(
             persist_directory=self.db_path,

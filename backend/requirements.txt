@@ -1,33 +1,32 @@
 # Frontend
 streamlit>=1.32.0
 
-# Backend Framework
+# Backend Framework & Utilities
 fastapi>=0.110.0
 uvicorn>=0.28.0
 requests>=2.31.0
 python-dotenv>=1.0.0
+python-multipart>=0.0.9
 
-# AI & LangChain (API-Based to save 400MB RAM)
+# AI & LangChain (API-Based)
 langchain>=0.1.13
 langchain-core>=0.1.33
 langchain-community>=0.0.29
 langchain-google-genai>=1.0.1
 google-generativeai>=0.4.1
-python-multipart>=0.0.9
+
 # Vector Database (Lite)
 chromadb>=0.4.24
 langchain-chroma>=0.1.0
+# Add this to fix SQLite issues on Render
+pysqlite3-binary
 
 # Document Parsing & OCR
 pypdf>=4.0.0
 python-docx>=1.1.0
-# We keep these but ensure we don't load them until needed
 opencv-python-headless>=4.9.0.80
 pytesseract>=0.3.10
 fpdf>=1.7.2
-python-dotenv>=1.0.0
+
 # Web Search
 duckduckgo-search>=5.2.1
-
-# REMOVED: faiss-cpu, sentence-transformers, langchain-huggingface
-# These three are the "RAM Killers" that cause the crash.
