@@ -113,15 +113,32 @@ class LegalAgents:
 
     def generate_timeline(self, retriever):
         retriever.search_kwargs = {"k": 50}
-        docs = retriever.invoke("dates events 2023 2024 2025")
+        docs = retriever.invoke("dates events 1990 to 2026") # Broader search range
         pdf_context = "\n\n".join(doc.page_content for doc in docs)
-        retriever.search_kwargs = {"k": 4}
-        
-        prompt = f"""You are an elite Legal Assistant. Extract a chronological timeline.
-        
+        retriever.search_kwargs = {"k": 5}
+        prompt = f"""You are an elite Legal Assistant. 
+        Analyze the following case excerpts and extract a chronological timeline of events.
+    
         CASE EXCERPTS:
         {pdf_context}
-        
-        FORMAT: **[Exact Date]** - [Event]
+    
+        FORMAT: 
+        **[Exact Date or Year]** - [Brief description of the legal event or filing]
+    
+        Only provide the timeline. Do not include introductory text or metadata signatures.
         """
-        return self.llm.invoke(prompt).content
+        response = self.llm.invoke(prompt)
+        if hasattr(response, 'content'):
+            clean_text = response.content
+        elif isinstance(response, list) and len(response) > 0:
+            item = response[0]
+            if isinstance(item, dict):
+                clean_text = item.get('text', str(item))
+            else:
+                clean_text = str(item)
+        else:
+        # Fallback for unexpected formats
+            clean_text = str(response)
+        
+        return clean_text
+        
