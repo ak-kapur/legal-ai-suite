@@ -27,5 +27,5 @@ python-docx>=1.1.0
 opencv-python-headless>=4.9.0.80
 pytesseract>=0.3.10
 fpdf>=1.7.2
-duckduckgo-search>=6.0.0
+ddgs>=0.5.0
 # Web Search
