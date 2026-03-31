@@ -9,6 +9,14 @@ class LegalAgents:
         self.api_key = os.getenv("GOOGLE_API_KEY")
         self._llm = None  # We start with None to boot instantly
 
+    def _clean_response(self, response):
+        """Utility to strip 2026 metadata signatures."""
+        content = response.content
+        if isinstance(content, list):
+            return content[0].get('text', str(content))
+        return str(content)
+
+
     @property
     def llm(self):
         """Lazy-loads the LLM only when a question is actually asked."""
@@ -112,33 +120,33 @@ class LegalAgents:
         return self.llm.invoke(final_prompt).content
 
     def generate_timeline(self, retriever):
+        # 1. Broad Retrieval
         retriever.search_kwargs = {"k": 50}
-        docs = retriever.invoke("dates events 1990 to 2026") # Broader search range
+        docs = retriever.invoke("chronological events and dates")
         pdf_context = "\n\n".join(doc.page_content for doc in docs)
-        retriever.search_kwargs = {"k": 5}
-        prompt = f"""You are an elite Legal Assistant. 
-        Analyze the following case excerpts and extract a chronological timeline of events.
-    
+        retriever.search_kwargs = {"k": 5} # Reset
+        
+        prompt = f"""You are an elite Legal Assistant. Extract a chronological timeline.
+        
         CASE EXCERPTS:
         {pdf_context}
-    
-        FORMAT: 
-        **[Exact Date or Year]** - [Brief description of the legal event or filing]
-    
-        Only provide the timeline. Do not include introductory text or metadata signatures.
+        
+        FORMAT: **[Exact Date]** - [Event]
         """
-        response = self.llm.invoke(prompt)
-        if hasattr(response, 'content'):
-            clean_text = response.content
-        elif isinstance(response, list) and len(response) > 0:
-            item = response[0]
-            if isinstance(item, dict):
-                clean_text = item.get('text', str(item))
-            else:
-                clean_text = str(item)
-        else:
-        # Fallback for unexpected formats
-            clean_text = str(response)
         
-        return clean_text
+        # 2. Invoke the model
+        raw_response = self.llm.invoke(prompt)
         
+        # 3. THE 2026 SCRUBBER: 
+        # Even if .content is called, it might return a list [ {'text': '...', 'extras': {...} } ]
+        content = raw_response.content
+        
+        if isinstance(content, list):
+            # If it's a list of parts, grab the text from the first part only
+            first_part = content[0]
+            if isinstance(first_part, dict):
+                return first_part.get('text', str(first_part))
+            return str(first_part)
+        
+        # If it's already a string, return it directly
+        return str(content)        
